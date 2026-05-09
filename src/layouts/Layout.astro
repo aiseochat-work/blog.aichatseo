@@ -1,0 +1,116 @@
+---
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import { absoluteUrl, canonicalFromRequest } from '../lib/site-url';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  articlePublishedTime?: string;
+  articleModifiedTime?: string;
+  /** Set for JSON-LD / OG on articles */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  ogImage,
+  ogType = 'website',
+  articlePublishedTime,
+  articleModifiedTime,
+  jsonLd,
+  noindex,
+} = Astro.props;
+const canonical = canonicalFromRequest(Astro.url);
+const desc =
+  description ||
+  'Insights on conversational SEO, Search Console workflows, and staying visible as search evolves — from AIChatSEO.';
+const og = ogImage || absoluteUrl('/favicon.svg');
+const jsonLdBlocks = jsonLd
+  ? Array.isArray(jsonLd)
+    ? jsonLd
+    : [jsonLd]
+  : [];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={desc} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content={ogType} />
+    {articlePublishedTime && (
+      <meta property="article:published_time" content={articlePublishedTime} />
+    )}
+    {articleModifiedTime && <meta property="article:modified_time" content={articleModifiedTime} />}
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={og} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={desc} />
+    <meta name="twitter:image" content={og} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    {
+      jsonLdBlocks.map((block) => (
+        <script type="application/ld+json" set:html={JSON.stringify(block)} />
+      ))
+    }
+  </head>
+  <body
+    class="flex min-h-screen flex-col antialiased selection:bg-sky-200/80 selection:text-slate-900"
+  >
+    <div class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.22),transparent_32rem),linear-gradient(180deg,#f8fafc_0%,#eaf6f9_42%,#ffffff_100%)]" aria-hidden="true" />
+    <div class="pointer-events-none fixed inset-x-0 top-0 -z-10 h-24 bg-slate-950/95" aria-hidden="true" />
+    <SiteHeader />
+    <div class="flex-1">
+      <slot />
+    </div>
+    <SiteFooter />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --ink: 15 23 42;
+    --muted: 100 116 139;
+  }
+  html {
+    font-family:
+      'Inter',
+      system-ui,
+      -apple-system,
+      Segoe UI,
+      Roboto,
+      sans-serif;
+    color: rgb(var(--ink));
+  }
+  code {
+    font-family:
+      ui-monospace,
+      SFMono-Regular,
+      Menlo,
+      Monaco,
+      Consolas,
+      monospace;
+    font-size: 0.9em;
+  }
+</style>
