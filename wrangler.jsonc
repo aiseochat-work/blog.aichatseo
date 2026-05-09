@@ -10,7 +10,8 @@
     "not_found_handling": "404-page"
   },
   "vars": {
-    "PUBLIC_SITE_URL": "https://blog.aichatseo.com"
+    "PUBLIC_SITE_URL": "https://blog.aichatseo.com",
+    "DATABASE_URL": "postgresql://neondb_owner:npg_JguEeTK8j4kA@ep-jolly-dream-aqtop3hn.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require"
   },
   "observability": {
     "enabled": true
