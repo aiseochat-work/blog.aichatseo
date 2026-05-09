@@ -6,8 +6,9 @@ import tailwind from '@astrojs/tailwind';
 export default defineConfig({
   site: process.env.PUBLIC_SITE_URL || 'https://blog.aichatseo.com',
   output: 'server',
+  // 'cloudflare' image service can break Cloudflare builds (emitAsset / Vite externals).
   adapter: cloudflare({
-    imageService: 'cloudflare',
+    imageService: 'passthrough',
   }),
   integrations: [tailwind()],
   session: {
