@@ -25,6 +25,7 @@ npm run db:migrate
 
 Run `npm run db:migrate` for normal deploys. The app also performs an idempotent schema bootstrap before blog queries so a fresh Cloudflare deployment does not fail if the `posts` table has not been created yet.
 
+
 The protected seed utility is available at `/seed?token=YOUR_SEED_TOKEN`. It inserts or refreshes sample posts and is disabled in production without a valid token.
 
 ## Cloudflare Notes
