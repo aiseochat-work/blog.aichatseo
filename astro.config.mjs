@@ -10,4 +10,9 @@ export default defineConfig({
     imageService: 'cloudflare',
   }),
   integrations: [tailwind()],
+  session: {
+    driver: {
+      entrypoint: 'unstorage/drivers/null',
+    },
+  },
 });
