@@ -11,8 +11,6 @@ export default defineConfig({
   }),
   integrations: [tailwind()],
   session: {
-    driver: {
-      entrypoint: 'unstorage/drivers/null',
-    },
+    driver: 'unstorage/drivers/null',
   },
 });
