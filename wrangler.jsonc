@@ -1,8 +1,7 @@
 {
-  // Use Astro's Cloudflare entrypoint so Wrangler loads the SSR manifest
-  // from the current build instead of targeting the generated worker bundle directly.
+  // Worker + static assets layout from astro build (@astrojs/cloudflare 12+)
   "name": "blogaichatseo",
-  "main": "@astrojs/cloudflare/entrypoints/server.js",
+  "main": "./dist/_worker.js/index.js",
   "compatibility_date": "2026-05-09",
   "compatibility_flags": ["nodejs_compat"],
   // Wrangler otherwise deletes dashboard-only variables on each deploy; Git-based deploys trigger that too.
