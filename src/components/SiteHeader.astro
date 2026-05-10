@@ -1,84 +1,208 @@
 ---
 const MARKETING = 'https://www.aichatseo.com';
-const nav = [
-  { label: 'Features', href: `${MARKETING}/#features` },
-  { label: 'Blog', href: '/' },
-  { label: 'Pricing', href: `${MARKETING}/pricing` },
-  { label: 'About', href: `${MARKETING}/about` },
-];
 const path = Astro.url.pathname;
 const blogActive = path === '/' || path.startsWith('/blog');
+
+const navLinks = [
+  { label: 'Features', href: `${MARKETING}/#features` },
+  { label: 'Blog',     href: '/',                        active: blogActive },
+  { label: 'Pricing',  href: `${MARKETING}/pricing` },
+  { label: 'About',    href: `${MARKETING}/about` },
+];
 ---
 
-<header class="sticky top-0 z-50 px-4 pb-2 pt-4 sm:px-6">
-  <nav
-    class="mx-auto flex max-w-6xl items-center justify-between gap-4 rounded-4xl border border-white/10 bg-slate-950/90 px-4 py-3 text-white shadow-soft backdrop-blur-md sm:px-6"
-    aria-label="Primary"
+<!-- ─── Sticky frosted-glass navbar ─── -->
+<header id="site-header" class="fixed left-0 right-0 top-0 z-50 px-3 py-3 md:px-4 md:py-4">
+  <div
+    id="nav-pill"
+    class="mx-auto flex max-w-7xl items-center justify-between rounded-full px-4 py-0 md:px-6 transition-all duration-300 h-14 md:h-16"
+    style="
+      background: rgba(255,255,255,0.60);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.85);
+      box-shadow: 0 4px 24px 0 rgba(100,116,139,0.12);
+    "
   >
-    <a
-      href={MARKETING}
-      class="flex shrink-0 items-center gap-2 font-semibold tracking-tight text-white"
-    >
-      <span
-        class="grid h-9 w-9 place-items-center rounded-2xl bg-gradient-to-br from-sky-300 to-sky-600 text-sm font-bold text-slate-950 shadow-soft"
-        aria-hidden="true"
-      >
-        AI
+    <!-- Logo -->
+    <a href={MARKETING} class="flex min-h-10 shrink-0 items-center gap-2 text-slate-800 transition-opacity hover:opacity-80">
+      <!-- Wordmark using Camaufalge / fallback serif -->
+      <span class="text-xl font-black tracking-tight text-[#3b7597]" style="font-family:'Camaufalge',serif;">
+        AIChatSEO
       </span>
-      <span class="hidden sm:inline">aichatseo</span>
+      <span class="rounded-sm bg-[#80c4e9]/20 px-1.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-widest text-[#3b7597]">
+        Blog
+      </span>
     </a>
 
-    <ul class="hidden flex-1 items-center justify-center gap-1 md:flex">
-      {
-        nav.map((item) => (
-          <li>
-            <a
-              href={item.href}
-              class:list={[
-                'rounded-full px-3 py-2 text-sm font-medium transition',
-                item.label === 'Blog' && blogActive && 'bg-white/10 text-sky-100',
-                item.label === 'Blog' && !blogActive && 'text-slate-300 hover:bg-white/10 hover:text-white',
-                item.label !== 'Blog' && 'text-slate-300 hover:bg-white/10 hover:text-white',
-              ]}
-            >
-              {item.label}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+    <!-- Desktop nav links pill -->
+    <div class="hidden items-center gap-1 rounded-full border border-white/70 bg-white/38 px-2 py-1 backdrop-blur-md md:flex">
+      {navLinks.map((item) => (
+        <a
+          href={item.href}
+          class:list={[
+            'rounded-full px-4 py-2 text-sm font-medium transition-[background-color,color,transform]',
+            item.active
+              ? 'bg-white/88 text-slate-900 shadow-[0_10px_24px_-18px_rgba(15,23,42,0.28)]'
+              : 'text-slate-600 hover:bg-white/50 hover:text-[#3b7597]',
+          ]}
+        >
+          {item.label}
+        </a>
+      ))}
+    </div>
 
-    <div class="flex shrink-0 items-center gap-2">
+    <!-- Actions -->
+    <div class="flex shrink-0 items-center gap-2 md:gap-3">
       <a
         href={`${MARKETING}/sign-in`}
-        class="hidden rounded-full px-3 py-2 text-sm font-medium text-slate-300 transition hover:text-white sm:inline"
+        class="hidden rounded-full px-3 py-2 text-sm font-bold text-slate-600 transition-colors hover:text-[#3b7597] md:block"
       >
         Log in
       </a>
       <a
         href={`${MARKETING}/sign-up`}
-        class="inline-flex items-center justify-center rounded-full bg-white px-3 py-2 text-sm font-semibold text-slate-950 shadow-soft transition hover:bg-sky-100 sm:px-4"
+        class="hidden sm:inline-flex items-center justify-center rounded-full bg-[#80c4e9] px-4 py-2 text-xs font-bold text-white transition-[background-color,box-shadow,transform] hover:bg-[#67b1dd] hover:shadow-[0_4px_20px_-4px_rgba(128,196,233,0.45)] md:px-6 md:text-sm"
       >
-        Get Started Free
+        Get Started
       </a>
-    </div>
-  </nav>
 
-  <div class="mx-auto mt-2 flex max-w-6xl gap-1 overflow-x-auto pb-1 md:hidden" role="navigation" aria-label="Sections">
-    {
-      nav.map((item) => (
-        <a
-          href={item.href}
-          class:list={[
-            'shrink-0 rounded-full px-3 py-1.5 text-xs font-medium',
-            item.label === 'Blog' && blogActive && 'bg-sky-100 text-sky-900',
-            item.label === 'Blog' && !blogActive && 'bg-white/90 text-slate-600 ring-1 ring-slate-200',
-            item.label !== 'Blog' && 'bg-white/90 text-slate-600 ring-1 ring-slate-200',
-          ]}
-        >
-          {item.label}
-        </a>
-      ))
-    }
+      <!-- Animated hamburger (mobile only) -->
+      <button
+        id="menu-toggle"
+        aria-label="Open menu"
+        aria-expanded="false"
+        class="relative flex h-10 w-10 flex-col items-center justify-center rounded-xl transition-colors hover:bg-white/40 md:hidden"
+      >
+        <span id="bar-top"    class="absolute block h-0.5 w-5 rounded-full bg-slate-800 transition-transform  duration-300 ease-in-out -translate-y-1"></span>
+        <span id="bar-mid"    class="absolute block h-0.5 w-5 rounded-full bg-slate-800 transition-[transform,opacity] duration-300 ease-in-out"></span>
+        <span id="bar-bot"    class="absolute block h-0.5 w-5 rounded-full bg-slate-800 transition-transform  duration-300 ease-in-out translate-y-1"></span>
+      </button>
+    </div>
   </div>
 </header>
+
+<!-- ─── Mobile overlay menu ─── -->
+<div
+  id="mobile-menu"
+  class="pointer-events-none fixed inset-0 z-40 opacity-0 transition-opacity duration-300 md:hidden"
+  aria-hidden="true"
+>
+  <!-- Backdrop -->
+  <div id="menu-backdrop" class="absolute inset-0 bg-slate-900/20 backdrop-blur-sm"></div>
+
+  <!-- Panel -->
+  <div
+    id="menu-panel"
+    class="-translate-y-4 absolute left-3 right-3 top-[76px] scale-[0.98] overflow-hidden rounded-2xl opacity-0 transition-[transform,opacity] duration-300 ease-out"
+    style="
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.9);
+      box-shadow: 0 20px 60px -10px rgba(0,0,0,0.15), 0 4px 20px rgba(0,0,0,0.05);
+    "
+  >
+    <nav class="p-5">
+      <ul class="space-y-1">
+        {navLinks.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class:list={[
+                'flex items-center justify-between rounded-xl px-4 py-3.5 text-base font-semibold transition-colors',
+                item.active ? 'bg-[#f0f9ff] text-[#3b7597]' : 'text-slate-800 hover:bg-[#f4fbff]',
+              ]}
+            >
+              {item.label}
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="m9 18 6-6-6-6"/></svg>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <div class="mt-4 space-y-2.5 border-t border-slate-200/80 pt-4">
+        <a
+          href={`${MARKETING}/sign-in`}
+          class="flex h-12 w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-5 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
+        >
+          Log in
+        </a>
+        <a
+          href={`${MARKETING}/sign-up`}
+          class="flex h-12 w-full items-center justify-center rounded-xl bg-[#80c4e9] px-5 text-sm font-bold text-white shadow-[0_4px_15px_-3px_rgba(128,196,233,0.45)] transition-colors hover:bg-[#67b1dd]"
+        >
+          Get Started Free
+        </a>
+      </div>
+    </nav>
+  </div>
+</div>
+
+<script>
+  // ── Scroll: tighten the pill on scroll ──────────────────────────────────────
+  const pill = document.getElementById('nav-pill');
+  const onScroll = () => {
+    const scrolled = window.scrollY > 18;
+    if (pill) {
+      pill.style.background = scrolled ? 'rgba(255,255,255,0.76)' : 'rgba(255,255,255,0.60)';
+      pill.style.backdropFilter = scrolled ? 'blur(28px)' : 'blur(24px)';
+      pill.style.webkitBackdropFilter = scrolled ? 'blur(28px)' : 'blur(24px)';
+      pill.style.border = scrolled ? '1px solid rgba(255,255,255,0.92)' : '1px solid rgba(255,255,255,0.85)';
+      pill.style.boxShadow = scrolled
+        ? '0 12px 36px 0 rgba(100,116,139,0.16)'
+        : '0 4px 24px 0 rgba(100,116,139,0.12)';
+      pill.style.height = scrolled ? (window.innerWidth >= 768 ? '3.7rem' : '3.25rem') : (window.innerWidth >= 768 ? '4rem' : '3.5rem');
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  // ── Hamburger toggle ────────────────────────────────────────────────────────
+  const toggle   = document.getElementById('menu-toggle');
+  const menu     = document.getElementById('mobile-menu');
+  const panel    = document.getElementById('menu-panel');
+  const barTop   = document.getElementById('bar-top');
+  const barMid   = document.getElementById('bar-mid');
+  const barBot   = document.getElementById('bar-bot');
+  const backdrop = document.getElementById('menu-backdrop');
+
+  let open = false;
+
+  const openMenu = () => {
+    open = true;
+    menu!.classList.replace('pointer-events-none', 'pointer-events-auto');
+    menu!.classList.replace('opacity-0', 'opacity-100');
+    menu!.setAttribute('aria-hidden', 'false');
+    toggle!.setAttribute('aria-expanded', 'true');
+    toggle!.setAttribute('aria-label', 'Close menu');
+    panel!.classList.remove('-translate-y-4', 'opacity-0', 'scale-[0.98]');
+    panel!.classList.add('translate-y-0', 'opacity-100', 'scale-100');
+    barTop!.style.transform = 'rotate(45deg)';
+    barMid!.style.opacity = '0';
+    barMid!.style.transform = 'scaleX(0)';
+    barBot!.style.transform = 'rotate(-45deg)';
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeMenu = () => {
+    open = false;
+    menu!.classList.replace('pointer-events-auto', 'pointer-events-none');
+    menu!.classList.replace('opacity-100', 'opacity-0');
+    menu!.setAttribute('aria-hidden', 'true');
+    toggle!.setAttribute('aria-expanded', 'false');
+    toggle!.setAttribute('aria-label', 'Open menu');
+    panel!.classList.remove('translate-y-0', 'opacity-100', 'scale-100');
+    panel!.classList.add('-translate-y-4', 'opacity-0', 'scale-[0.98]');
+    barTop!.style.transform = 'translateY(-4px)';
+    barMid!.style.opacity = '1';
+    barMid!.style.transform = 'scaleX(1)';
+    barBot!.style.transform = 'translateY(4px)';
+    document.body.style.overflow = '';
+  };
+
+  toggle?.addEventListener('click', () => (open ? closeMenu() : openMenu()));
+  backdrop?.addEventListener('click', closeMenu);
+
+  // Close on any nav link click inside the panel
+  panel?.querySelectorAll('a').forEach((a) => a.addEventListener('click', closeMenu));
+</script>
