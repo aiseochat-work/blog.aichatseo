@@ -101,102 +101,84 @@ setBlogCacheHeaders(Astro.response.headers);
       articleModifiedTime={modifiedIso}
       jsonLd={[articleLd!, breadcrumbLd!]}
     >
-      <main class="mx-auto max-w-7xl px-4 pb-24 pt-6 sm:px-6 sm:pt-10">
-        <a
-          href="/"
-          class="inline-flex items-center gap-1 text-sm font-medium text-sky-700 transition hover:text-sky-900"
-        >
-          ← All posts
-        </a>
+      <main class="mx-auto max-w-4xl px-4 pb-24 pt-6 sm:px-6 sm:pt-10">
+        <article class="flex flex-col items-center">
+          <header class="mb-16 flex w-full flex-col items-center justify-center text-center">
+            <div class="mb-8 flex w-full justify-start">
+              <a
+                href="/"
+                class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                Back to blogs
+              </a>
+            </div>
+            
+            <p class="inline-block rounded-full border border-[#80c4e9]/20 bg-[#80c4e9]/10 px-4 py-1.5 text-xs font-mono uppercase tracking-widest text-[#3b7597] mb-6">
+              {new Date(post.createdAt!).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
+              {' • '}
+              {readMins} min read
+            </p>
+            
+            <h1 class="mb-8 text-4xl font-extrabold leading-tight tracking-tight text-slate-800 md:text-5xl lg:text-7xl">
+              {post.title}
+            </h1>
+            
+            {post.excerpt && (
+              <p class="max-w-2xl text-lg font-medium leading-relaxed text-slate-600 lg:text-xl">
+                {post.excerpt}
+              </p>
+            )}
 
-        <article class="mt-8 rounded-[2rem] border border-slate-200/90 bg-white shadow-float">
-          <header class="rounded-t-[2rem] border-b border-slate-200 bg-gradient-to-br from-white via-sky-50/60 to-slate-50 p-6 sm:p-10 lg:p-12">
-            <div class="mx-auto max-w-3xl">
-              {postTags.length ? (
-                <ul class="mb-5 flex flex-wrap gap-2">
-                  {postTags.map((t) => (
-                    <li>
-                      <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-sky-900 ring-1 ring-sky-100">
-                        {t}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-
-              <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500">
-                <time datetime={publishedIso}>{new Date(post.createdAt!).toLocaleDateString(undefined, { dateStyle: 'long' })}</time>
-                <span aria-hidden="true">·</span>
-                <span>{readMins} min read</span>
-                <span aria-hidden="true">·</span>
-                <span>{authorName}</span>
+            <div class="flex flex-row gap-3 mt-8 items-center">
+              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 border border-slate-200">
+                <span class="text-slate-500 font-bold text-lg">{authorName[0]}</span>
               </div>
-
-              <h1 class="mt-6 text-4xl font-extrabold tracking-tight text-slate-950 sm:text-5xl sm:leading-tight">
-                {post.title}
-              </h1>
-
-              {post.excerpt ? <p class="mt-6 text-xl leading-relaxed text-slate-600">{post.excerpt}</p> : null}
+              <div class="text-sm text-left">
+                <p class="text-slate-900 font-bold text-base">
+                  {authorName}
+                </p>
+                <p class="text-slate-500 font-mono uppercase tracking-widest text-[10px] mt-1">
+                  Author
+                </p>
+              </div>
             </div>
 
-            {post.coverImage ? (
-              <div class="mx-auto mt-10 max-w-4xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft">
+            {post.coverImage && (
+              <div class="relative w-full max-w-4xl h-[300px] lg:h-[500px] mt-12 lg:mt-16 rounded-xl overflow-hidden shadow-lg">
                 <img
                   src={post.coverImage}
-                  alt=""
-                  class="aspect-[1200/630] w-full object-cover"
-                  width={1200}
-                  height={630}
+                  alt={post.title}
+                  class="h-full w-full object-cover"
                 />
               </div>
-            ) : null}
+            )}
           </header>
 
-          <div class="grid gap-10 px-6 py-10 md:grid-cols-[14rem_minmax(0,1fr)] lg:grid-cols-[15rem_minmax(0,44rem)_1fr] lg:px-10 lg:py-12">
-            <aside class="hidden md:block">
-              <div class="sticky top-28 rounded-3xl border border-slate-200 bg-slate-50/80 p-5">
-                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">On this page</p>
-                {preparedContent?.toc.length ? (
-                  <nav class="mt-4" aria-label="Table of contents">
-                    <ol class="space-y-2 text-sm">
-                      {preparedContent.toc.map((item) => (
-                        <li class:list={[item.depth === 3 && 'pl-4']}>
-                          <a
-                            href={`#${item.id}`}
-                            class="block rounded-xl px-3 py-2 text-slate-600 transition hover:bg-white hover:text-sky-800"
-                          >
-                            {item.text}
-                          </a>
-                        </li>
-                      ))}
-                    </ol>
-                  </nav>
-                ) : (
-                  <p class="mt-4 text-sm leading-6 text-slate-500">This article is short enough to read straight through.</p>
-                )}
-              </div>
-            </aside>
-
-            {preparedContent?.toc.length ? (
-              <details class="rounded-3xl border border-slate-200 bg-slate-50 p-5 md:hidden">
-                <summary class="cursor-pointer text-sm font-semibold text-slate-900">Table of contents</summary>
-                <ol class="mt-4 space-y-2 text-sm">
-                  {preparedContent.toc.map((item) => (
-                    <li class:list={[item.depth === 3 && 'pl-4']}>
-                      <a href={`#${item.id}`} class="text-slate-600 hover:text-sky-800">
-                        {item.text}
-                      </a>
-                    </li>
-                  ))}
-                </ol>
-              </details>
-            ) : null}
-
-            <div
-              class="prose prose-slate prose-lg max-w-none prose-headings:scroll-mt-28 prose-headings:font-bold prose-headings:text-slate-950 prose-a:text-sky-700 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 prose-code:rounded-md prose-code:bg-slate-100 prose-code:px-1 prose-code:py-0.5 prose-code:text-slate-800 prose-pre:bg-slate-900 prose-pre:text-slate-100"
-            >
-              <div set:html={preparedContent!.html} />
+          <div class="flex w-full flex-col gap-6 rounded-[2rem] border border-slate-200 bg-white/80 px-6 py-6 shadow-[0_18px_50px_-38px_rgba(15,23,42,0.28)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex flex-row flex-wrap gap-2">
+              {postTags.map((tag) => (
+                <div class="flex items-center justify-center text-[10px] lg:text-xs px-3 py-1 rounded-full text-sky-700 bg-sky-100/50 border border-sky-200/50 font-mono tracking-widest uppercase shadow-[0_0_10px_rgba(46,64,54,0.05)]">
+                  {tag}
+                </div>
+              ))}
             </div>
+            
+            <!-- Removed dynamic Next.js ShareBtn, replaced with static placeholder for UI -->
+            <div class="flex items-center gap-2">
+               <button class="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm transition-colors hover:bg-slate-100 hover:text-slate-900">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+                  Share
+               </button>
+            </div>
+          </div>
+
+          <div class="py-12 lg:py-16 w-full prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-a:text-sky-600 hover:prose-a:text-sky-800 prose-img:rounded-xl">
+            <div set:html={preparedContent!.html} />
           </div>
         </article>
 

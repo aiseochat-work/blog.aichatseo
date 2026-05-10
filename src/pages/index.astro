@@ -10,7 +10,7 @@ await ensureDatabaseReady();
 const allPosts = await db.select().from(posts).orderBy(descOrder(posts.createdAt));
 
 const pageDescription =
-  'Practical notes on conversational SEO, Search Console signals, and making search performance easier to act on — from the AIChatSEO team.';
+  'Search insights, product notes, and practical SEO thinking. Tactical breakdowns on content decay, Search Console workflows, reporting clarity, and the product decisions behind AIChatSEO.';
 
 const websiteLd = {
   '@context': 'https://schema.org',
@@ -49,6 +49,16 @@ const itemListLd = {
   })),
 };
 
+const categoriesSet = new Set<string>();
+allPosts.forEach(post => {
+  if (post.tags) {
+    post.tags.forEach(tag => {
+      if (tag) categoriesSet.add(tag);
+    });
+  }
+});
+const categories = Array.from(categoriesSet).sort();
+
 setBlogCacheHeaders(Astro.response.headers);
 ---
 
@@ -58,140 +68,164 @@ setBlogCacheHeaders(Astro.response.headers);
   jsonLd={[websiteLd, itemListLd]}
   googleSiteVerification="P5UdfSYTpwMutruALFkfTCe4vo4il6SHc2eyts-5MsY"
 >
-  <main class="mx-auto max-w-6xl px-4 pb-20 pt-4 sm:px-6 sm:pt-8">
-    <section class="overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white/85 shadow-float backdrop-blur">
-      <div class="grid gap-10 p-6 sm:p-10 lg:grid-cols-[1.05fr_0.95fr] lg:p-12">
-        <div class="flex flex-col justify-center">
-          <p
-            class="mb-5 inline-flex w-fit items-center rounded-full border border-sky-200/80 bg-sky-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-sky-900"
-          >
-            Conversational SEO intelligence
-          </p>
-          <h1 class="max-w-3xl text-4xl font-extrabold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
-            Ask first. Investigate faster.
-          </h1>
-          <p class="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-            Practical notes from AIChatSEO on diagnosing visibility shifts, finding striking-distance pages,
-            and turning Search Console signals into action.
-          </p>
-          <div class="mt-8 flex flex-wrap gap-3 text-sm font-medium">
-            <a
-              href="https://www.aichatseo.com/sign-up"
-              class="rounded-full bg-slate-950 px-5 py-3 text-white shadow-soft transition hover:bg-sky-700"
-            >
-              Start free
-            </a>
-            <a
-              href="https://www.aichatseo.com/#features"
-              class="rounded-full border border-slate-200 bg-white px-5 py-3 text-slate-700 transition hover:border-sky-200 hover:text-sky-800"
-            >
-              Explore product
-            </a>
-          </div>
-        </div>
-        <div class="rounded-[1.75rem] border border-slate-200 bg-slate-950 p-5 text-white shadow-soft">
-          <div class="mb-5 flex items-center justify-between text-xs text-slate-400">
-            <span>[DIAGNOSTIC_ACTIVE]</span>
-            <span>LCP 1.2s</span>
-          </div>
-          <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
-            <p class="text-sm text-sky-200">AIChat Assistant</p>
-            <p class="mt-3 text-lg font-semibold">Why did traffic drop on /blog yesterday?</p>
-            <p class="mt-4 text-sm leading-6 text-slate-300">
-              Impressions fell across a small query cluster. Rankings were mostly stable, so refresh
-              time-sensitive examples and resubmit key URLs.
+  <div class="fixed inset-0 z-[-1] pointer-events-none gradient-mesh"></div>
+
+  <div class="relative z-10 px-4 pb-16 pt-12 md:pt-20">
+    <main class="container mx-auto max-w-6xl">
+      <section class="mb-14 overflow-hidden rounded-[2.5rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.9),rgba(244,251,255,0.9))] px-6 py-10 shadow-[0_26px_80px_-44px_rgba(15,23,42,0.34)] backdrop-blur-xl md:px-10 md:py-14">
+        <div class="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+          <div class="max-w-3xl space-y-5">
+            <div class="inline-flex rounded-full border border-[#80c4e9]/20 bg-[#80c4e9]/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#3b7597] md:text-xs">
+              Editorial
+            </div>
+            <h1 class="text-4xl font-extrabold tracking-tight text-slate-800 md:text-6xl">
+              Search insights, product notes, and practical SEO thinking.
+            </h1>
+            <p class="max-w-2xl text-base leading-7 text-slate-500 md:text-lg">
+              This is where we publish tactical breakdowns on content decay,
+              Search Console workflows, reporting clarity, and the product
+              decisions behind AIChatSEO.
             </p>
           </div>
-          <div class="mt-4 grid grid-cols-3 gap-3 text-center text-xs">
-            <div class="rounded-2xl bg-white/5 p-3">
-              <p class="text-lg font-bold text-white">-14%</p>
-              <p class="mt-1 text-slate-400">Impressions</p>
+
+          <div class="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+            <div class="rounded-[1.75rem] border border-white/70 bg-white/80 p-5">
+              <div class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#3b7597]">
+                Articles
+              </div>
+              <div class="mt-2 text-3xl font-bold text-slate-800">
+                {allPosts.length}
+              </div>
             </div>
-            <div class="rounded-2xl bg-white/5 p-3">
-              <p class="text-lg font-bold text-white">4.8</p>
-              <p class="mt-1 text-slate-400">Avg pos.</p>
+            <div class="rounded-[1.75rem] border border-white/70 bg-white/80 p-5">
+              <div class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#3b7597]">
+                Topics
+              </div>
+              <div class="mt-2 text-3xl font-bold text-slate-800">
+                {categories.length}
+              </div>
             </div>
-            <div class="rounded-2xl bg-white/5 p-3">
-              <p class="text-lg font-bold text-white">Fix</p>
-              <p class="mt-1 text-slate-400">Next move</p>
+            <div class="rounded-[1.75rem] border border-white/70 bg-white/80 p-5">
+              <div class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#3b7597]">
+                Focus
+              </div>
+              <div class="mt-2 text-base font-semibold text-slate-800">
+                Search Console-native workflows
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="mt-12">
-      <div class="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-        <div>
-          <p class="text-sm font-semibold uppercase tracking-[0.2em] text-sky-800">Latest insights</p>
-          <h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-950">Search performance playbooks</h2>
+      <section class="w-full space-y-12">
+        <div class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_18px_50px_-36px_rgba(15,23,42,0.28)]">
+          <div class="flex flex-col gap-4 border-b border-slate-200 px-5 py-5 md:flex-row md:items-center md:justify-between md:px-6">
+            <div>
+              <div class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#3b7597]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+                Editorial Library
+              </div>
+              <p class="mt-2 text-sm text-slate-500">
+                Browse strategy notes, product thinking, and search workflow breakdowns.
+              </p>
+            </div>
+            <div class="rounded-2xl bg-[#f4fbff] px-4 py-3 text-sm text-slate-600">
+              <span class="font-bold text-slate-800">{allPosts.length}</span> article{allPosts.length === 1 ? "" : "s"}
+            </div>
+          </div>
         </div>
-        <p class="max-w-md text-sm leading-6 text-slate-500">
-          Clear workflows for SEO teams that want less dashboard friction and faster decisions.
-        </p>
-      </div>
-      <div class="grid gap-6">
-      {
-        allPosts.length === 0 ? (
+
+        {allPosts.length > 0 ? (
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {allPosts.map((post) => (
+              <a
+                href={`/blog/${post.slug}`}
+                class="group flex h-full min-h-[420px] flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1.5 hover:border-[#8ccdeb] hover:shadow-[0_24px_60px_-34px_rgba(15,23,42,0.34)]"
+              >
+                {post.coverImage ? (
+                  <div class="relative aspect-[16/10] w-full overflow-hidden">
+                    <img
+                      src={post.coverImage}
+                      alt={post.title || "Blog Image"}
+                      class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/20 via-transparent to-white/10" />
+
+                    <div class="absolute left-4 top-4 flex items-center gap-1 rounded-full border border-white/60 bg-white/88 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-800 shadow-sm backdrop-blur-md">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky-500"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      {Math.ceil(post.content ? post.content.split(' ').length / 200 : 5)} min
+                    </div>
+                  </div>
+                ) : (
+                  <div class="relative flex aspect-[16/10] w-full shrink-0 items-center justify-center bg-gradient-to-br from-sky-100 to-slate-100 sm:aspect-auto sm:w-56">
+                    <span class="text-4xl font-black text-sky-300/90" aria-hidden="true">
+                      AI
+                    </span>
+                  </div>
+                )}
+
+                <div class="flex flex-grow flex-col p-5 md:p-6">
+                  <div class="mb-4 flex flex-wrap items-center gap-2">
+                    {post.createdAt && (
+                      <div class="inline-flex h-6 items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0 text-[10px] font-bold uppercase tracking-wider text-slate-600 hover:bg-slate-200">
+                        {new Date(post.createdAt).toLocaleDateString("en-GB", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </div>
+                    )}
+                    {post.tags?.[0] && (
+                      <div class="inline-flex h-6 items-center rounded-full border border-[#80c4e9]/20 bg-[#80c4e9]/10 px-2.5 py-0 text-[10px] font-bold uppercase tracking-wider text-[#3b7597] shadow-none hover:bg-[#80c4e9]/10">
+                        {post.tags[0]}
+                      </div>
+                    )}
+                  </div>
+
+                  {post.title && (
+                    <h3 class="mb-3 line-clamp-3 text-[1.35rem] font-bold leading-[1.25] text-slate-800 transition-colors duration-300 group-hover:text-sky-600">
+                      {post.title}
+                    </h3>
+                  )}
+
+                  {post.excerpt && (
+                    <p class="mb-8 flex-grow text-sm leading-6 text-slate-500 line-clamp-3">
+                      {post.excerpt}
+                    </p>
+                  )}
+
+                  <div class="mt-auto flex items-center justify-between border-t border-slate-100 pt-4">
+                    <div class="flex items-center gap-3">
+                      <div class="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-100 shadow-sm">
+                        <span class="text-[10px] font-bold text-slate-500">
+                          {post.author?.[0] || 'A'}
+                        </span>
+                      </div>
+                      <div class="flex flex-col">
+                        <span class="line-clamp-1 text-xs font-bold text-slate-800">
+                          {post.author || 'AIChatSEO Team'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <span class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-[0.16em] text-sky-500 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+                      Read
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                    </span>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        ) : (
           <div class="rounded-4xl border border-slate-200 bg-white p-10 text-center shadow-float">
             <p class="text-slate-600">No posts yet.</p>
             <p class="mt-2 text-sm text-slate-500">Add posts through your database or run the protected seed utility in development.</p>
           </div>
-        ) : (
-          allPosts.map((post) => (
-            <article>
-              <a
-                href={`/blog/${post.slug}`}
-                class="group block overflow-hidden rounded-[1.75rem] border border-slate-200/90 bg-white shadow-soft transition hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-float"
-              >
-                <div class="flex flex-col sm:flex-row">
-                  {post.coverImage ? (
-                    <div class="relative aspect-[16/10] w-full shrink-0 sm:w-72 lg:w-80">
-                      <img
-                        src={post.coverImage}
-                        alt=""
-                        class="h-full w-full object-cover"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </div>
-                  ) : (
-                    <div class="relative flex aspect-[16/10] w-full shrink-0 items-center justify-center bg-gradient-to-br from-sky-100 to-slate-100 sm:aspect-auto sm:w-56">
-                      <span class="text-4xl font-black text-sky-300/90" aria-hidden="true">
-                        AI
-                      </span>
-                    </div>
-                  )}
-                  <div class="flex flex-1 flex-col justify-center p-6 sm:p-8 lg:p-10">
-                    {post.tags?.length ? (
-                      <ul class="mb-3 flex flex-wrap gap-2">
-                        {post.tags.map((t) => (
-                          <li>
-                            <span class="rounded-full bg-sky-50 px-2.5 py-0.5 text-xs font-medium text-sky-800">
-                              {t}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                    <h2 class="text-2xl font-bold text-slate-900 transition group-hover:text-sky-800">
-                      {post.title}
-                    </h2>
-                    {post.excerpt ? <p class="mt-3 line-clamp-3 text-slate-600">{post.excerpt}</p> : null}
-                    <div class="mt-5 flex flex-wrap items-center gap-3 text-sm text-slate-500">
-                      <time datetime={post.createdAt!.toISOString()}>
-                        {new Date(post.createdAt!).toLocaleDateString(undefined, { dateStyle: 'long' })}
-                      </time>
-                      <span class="font-medium text-sky-600">Read article →</span>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            </article>
-          ))
-        )
-      }
-      </div>
-    </section>
-  </main>
+        )}
+      </section>
+    </main>
+  </div>
 </Layout>
