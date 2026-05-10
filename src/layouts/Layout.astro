@@ -84,7 +84,6 @@ const jsonLdBlocks = jsonLd
     class="flex min-h-screen flex-col antialiased selection:bg-sky-200/80 selection:text-slate-900"
   >
     <div class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.22),transparent_32rem),linear-gradient(180deg,#f8fafc_0%,#eaf6f9_42%,#ffffff_100%)]" aria-hidden="true" />
-    <div class="pointer-events-none fixed inset-x-0 top-0 -z-10 h-24 bg-slate-950/95" aria-hidden="true" />
     <SiteHeader />
     <div class="flex-1">
       <slot />
@@ -94,6 +93,14 @@ const jsonLdBlocks = jsonLd
 </html>
 
 <style is:global>
+  @font-face {
+    font-family: 'Camaufalge';
+    src: url('/Camaufalge.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
   :root {
     --ink: 15 23 42;
     --muted: 100 116 139;

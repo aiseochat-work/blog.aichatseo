@@ -1,33 +1,102 @@
 ---
 const MARKETING = 'https://www.aichatseo.com';
 const year = new Date().getFullYear();
-const links = [
-  { label: 'Privacy Policy', href: `${MARKETING}/privacy` },
+
+const platformLinks = [
+  { label: 'Features',  href: `${MARKETING}/#features` },
+  { label: 'Pricing',   href: `${MARKETING}/pricing` },
+  { label: 'Dashboard', href: `${MARKETING}/dashboard` },
+];
+
+const companyLinks = [
+  { label: 'About Us', href: `${MARKETING}/about` },
+  { label: 'Blog',     href: '/' },
+  { label: 'Sign In',  href: `${MARKETING}/sign-in` },
+  { label: 'Sign Up',  href: `${MARKETING}/sign-up` },
+];
+
+const legalLinks = [
+  { label: 'Privacy Policy',   href: `${MARKETING}/privacy` },
   { label: 'Terms of Service', href: `${MARKETING}/terms` },
-  { label: 'Security', href: `${MARKETING}/security` },
-  { label: 'API Documentation', href: `${MARKETING}/docs` },
+  { label: 'Security',         href: `${MARKETING}/security` },
 ];
 ---
 
-<footer class="mt-auto border-t border-slate-200/80 bg-white/70 px-6 py-12 backdrop-blur-sm">
-  <div class="mx-auto flex max-w-6xl flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
-    <div class="text-sm text-slate-500">
-      <p class="font-medium text-slate-800">aichatseo</p>
-      <p class="mt-1">Get indexed, not perplexed.</p>
+<footer class="relative z-10 mt-auto w-full overflow-hidden border-t border-slate-200/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(241,248,252,0.92))] px-4 pb-8 pt-16 md:px-6 md:pb-10 md:pt-24">
+  <!-- Decorative blobs -->
+  <div class="pointer-events-none absolute bottom-[-120px] left-[-120px] size-[320px] rounded-full bg-[#b1f0f7]/24 blur-[110px]" aria-hidden="true" />
+  <div class="pointer-events-none absolute right-[-120px] top-[-120px] size-[320px] rounded-full bg-[#8ccdeb]/14 blur-[110px]" aria-hidden="true" />
+
+  <div class="relative z-10 mx-auto max-w-7xl">
+    <div class="grid grid-cols-2 gap-x-8 gap-y-12 md:grid-cols-3 lg:grid-cols-12 lg:gap-12">
+
+      <!-- Brand -->
+      <div class="col-span-2 md:col-span-3 lg:col-span-5 lg:pr-8">
+        <a href={MARKETING} class="mb-6 flex items-center gap-2 no-underline">
+          <span class="text-3xl font-black text-slate-900" style="font-family:'Camaufalge',serif;">
+            AIChatSEO
+          </span>
+        </a>
+        <p class="max-w-[320px] text-[15px] leading-relaxed text-slate-500">
+          The only AI-driven SEO platform that reveals the path through the
+          algorithm's complexity. Clearer signals. Better decisions.
+        </p>
+      </div>
+
+      <!-- Platform -->
+      <div class="col-span-1 lg:col-span-2 lg:col-start-7">
+        <h4 class="mb-5 text-[14px] font-semibold text-slate-900">Platform</h4>
+        <ul class="space-y-3.5 text-[15px] text-slate-500">
+          {platformLinks.map((l) => (
+            <li>
+              <a href={l.href} class="transition-colors hover:text-[#3b7597]">{l.label}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Company -->
+      <div class="col-span-1 lg:col-span-2">
+        <h4 class="mb-5 text-[14px] font-semibold text-slate-900">Company</h4>
+        <ul class="space-y-3.5 text-[15px] text-slate-500">
+          {companyLinks.map((l) => (
+            <li>
+              <a href={l.href} class="transition-colors hover:text-[#3b7597]">{l.label}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Legal -->
+      <div class="col-span-1 lg:col-span-2">
+        <h4 class="mb-5 text-[14px] font-semibold text-slate-900">Legal</h4>
+        <ul class="space-y-3.5 text-[15px] text-slate-500">
+          {legalLinks.map((l) => (
+            <li>
+              <a href={l.href} class="transition-colors hover:text-[#3b7597]">{l.label}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
-    <ul class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
-      {
-        links.map((l) => (
-          <li>
-            <a href={l.href} class="text-slate-600 transition hover:text-sky-700">
-              {l.label}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+
+    <!-- Bottom bar -->
+    <div class="mt-16 flex flex-col items-center justify-between gap-6 border-t border-slate-200/60 pt-8 md:mt-20 md:flex-row">
+      <p class="text-[15px] text-slate-500">© {year} AIChatSEO. All rights reserved.</p>
+      <div class="flex gap-6">
+        <!-- X / Twitter -->
+        <a href="#" class="text-slate-400 transition-colors hover:text-[#3b7597]" aria-label="Twitter">
+          <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+          </svg>
+        </a>
+        <!-- LinkedIn -->
+        <a href="#" class="text-slate-400 transition-colors hover:text-[#3b7597]" aria-label="LinkedIn">
+          <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd" />
+          </svg>
+        </a>
+      </div>
+    </div>
   </div>
-  <p class="mx-auto mt-8 max-w-6xl text-center text-xs text-slate-400">
-    © {year} AIChatSEO. All rights reserved.
-  </p>
 </footer>
