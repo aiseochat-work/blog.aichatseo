@@ -52,7 +52,12 @@ const itemListLd = {
 setBlogCacheHeaders(Astro.response.headers);
 ---
 
-<Layout title="Blog | AIChatSEO" description={pageDescription} jsonLd={[websiteLd, itemListLd]}>
+<Layout
+  title="Blog | AIChatSEO"
+  description={pageDescription}
+  jsonLd={[websiteLd, itemListLd]}
+  googleSiteVerification="P5UdfSYTpwMutruALFkfTCe4vo4il6SHc2eyts-5MsY"
+>
   <main class="mx-auto max-w-6xl px-4 pb-20 pt-4 sm:px-6 sm:pt-8">
     <section class="overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white/85 shadow-float backdrop-blur">
       <div class="grid gap-10 p-6 sm:p-10 lg:grid-cols-[1.05fr_0.95fr] lg:p-12">

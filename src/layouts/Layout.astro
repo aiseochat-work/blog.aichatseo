@@ -13,6 +13,7 @@ interface Props {
   /** Set for JSON-LD / OG on articles */
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   noindex?: boolean;
+  googleSiteVerification?: string;
 }
 
 const {
@@ -24,6 +25,7 @@ const {
   articleModifiedTime,
   jsonLd,
   noindex,
+  googleSiteVerification,
 } = Astro.props;
 const canonical = canonicalFromRequest(Astro.url);
 const desc =
@@ -42,6 +44,9 @@ const jsonLdBlocks = jsonLd
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {googleSiteVerification && (
+      <meta name="google-site-verification" content={googleSiteVerification} />
+    )}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
