@@ -7,9 +7,20 @@ interface Props {
   title: string;
   description?: string;
   ogImage?: string;
+  /** Alt text for the shared preview image (accessibility + some platforms). */
+  ogImageAlt?: string;
   ogType?: 'website' | 'article';
   articlePublishedTime?: string;
   articleModifiedTime?: string;
+  /** Visible tags → Open Graph `article:tag` when `ogType` is `article`. */
+  articleTags?: string[];
+  /** `<meta name="keywords">` (comma-separated if array). Most useful for non-Google crawlers. */
+  keywords?: string | string[];
+  /** `<meta name="author">` for posts. */
+  author?: string;
+  ogSiteName?: string;
+  /** Shorthand for `og:locale`, e.g. en_US */
+  locale?: string;
   /** Set for JSON-LD / OG on articles */
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   noindex?: boolean;
@@ -20,9 +31,15 @@ const {
   title,
   description,
   ogImage,
+  ogImageAlt,
   ogType = 'website',
   articlePublishedTime,
   articleModifiedTime,
+  articleTags,
+  keywords,
+  author,
+  ogSiteName = 'AIChatSEO Blog',
+  locale = 'en_US',
   jsonLd,
   noindex,
   googleSiteVerification,
@@ -32,6 +49,13 @@ const desc =
   description ||
   'Insights on conversational SEO, Search Console workflows, and staying visible as search evolves — from AIChatSEO.';
 const og = ogImage || absoluteUrl('/favicon.svg');
+const keywordsContent = keywords
+  ? (Array.isArray(keywords) ? keywords : [keywords])
+      .map((k) => k.trim())
+      .filter(Boolean)
+      .join(', ')
+  : '';
+const shareImageAlt = ogImageAlt?.trim() || undefined;
 const jsonLdBlocks = jsonLd
   ? Array.isArray(jsonLd)
     ? jsonLd
@@ -44,6 +68,7 @@ const jsonLdBlocks = jsonLd
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     {googleSiteVerification && (
       <meta name="google-site-verification" content={googleSiteVerification} />
     )}
@@ -51,22 +76,42 @@ const jsonLdBlocks = jsonLd
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     <meta name="description" content={desc} />
-    {noindex && <meta name="robots" content="noindex" />}
+    {keywordsContent && <meta name="keywords" content={keywordsContent} />}
+    {author?.trim() && <meta name="author" content={author.trim()} />}
+    {noindex ? (
+      <meta name="robots" content="noindex, nofollow" />
+    ) : (
+      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    )}
     <link rel="canonical" href={canonical} />
+    {!noindex && (
+      <>
+        <link rel="alternate" hreflang="en" href={canonical} />
+        <link rel="alternate" hreflang="x-default" href={canonical} />
+      </>
+    )}
 
     <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={ogSiteName} />
+    <meta property="og:locale" content={locale} />
     {articlePublishedTime && (
       <meta property="article:published_time" content={articlePublishedTime} />
     )}
     {articleModifiedTime && <meta property="article:modified_time" content={articleModifiedTime} />}
+    {ogType === 'article' &&
+      articleTags?.map((tag) => (
+        <meta property="article:tag" content={tag} />
+      ))}
     <meta property="og:title" content={title} />
     <meta property="og:description" content={desc} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={og} />
+    {shareImageAlt && <meta property="og:image:alt" content={shareImageAlt} />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={desc} />
     <meta name="twitter:image" content={og} />
+    {shareImageAlt && <meta name="twitter:image:alt" content={shareImageAlt} />}
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

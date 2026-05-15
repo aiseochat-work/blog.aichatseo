@@ -1,0 +1,177 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../../layouts/Layout.astro';
+import { setBlogCacheHeaders } from '../../../lib/cache';
+import {
+  BLOG_CATEGORY_LABELS,
+  BLOG_CATEGORY_SLUGS,
+  type BlogCategorySlug,
+} from '../../../lib/blog-categories';
+import { blogEntrySlug, blogPostPath, BLOG_HUB_PATH, blogCategoryPath } from '../../../lib/blog-slug';
+import { readingTimeMinutesFromMarkdown } from '../../../lib/reading-time';
+import { SCHEMA_PUBLISHER_ORG_ID, absoluteUrl, blogDocumentBase, schemaBlogId, schemaWebSiteId } from '../../../lib/site-url';
+
+export async function getStaticPaths() {
+  return BLOG_CATEGORY_SLUGS.map((category) => ({
+    params: { category },
+  }));
+}
+
+const category = Astro.params.category as BlogCategorySlug;
+const label = BLOG_CATEGORY_LABELS[category];
+
+const allPosts = (await getCollection('blog')).filter((p) => p.data.category === category).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const pageTitle = `${label} articles | AIChatSEO Blog`;
+const pageDescription = `Browse AIChatSEO articles on ${label.toLowerCase()}: practical guides, workflows, and analysis ideas.`;
+
+const hubUrl = absoluteUrl(`${BLOG_HUB_PATH}/`);
+const catUrl = absoluteUrl(blogCategoryPath(category));
+const siteHomeUrl = blogDocumentBase();
+const blogId = schemaBlogId();
+const webSiteId = schemaWebSiteId();
+const logoUrl = absoluteUrl('/favicon.svg');
+
+const organizationLd = {
+  '@type': 'Organization',
+  '@id': SCHEMA_PUBLISHER_ORG_ID,
+  name: 'AIChatSEO',
+  url: 'https://www.aichatseo.com',
+  logo: { '@type': 'ImageObject', url: logoUrl },
+};
+
+const listLd = {
+  '@type': 'CollectionPage',
+  '@id': catUrl,
+  url: catUrl,
+  name: pageTitle,
+  description: pageDescription,
+  inLanguage: 'en-US',
+  isPartOf: { '@id': blogId },
+  publisher: { '@id': SCHEMA_PUBLISHER_ORG_ID },
+  mainEntity: {
+    '@type': 'ItemList',
+    numberOfItems: allPosts.length,
+    itemListElement: allPosts.map((post, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'BlogPosting',
+        url: absoluteUrl(blogPostPath(blogEntrySlug(post))),
+        name: post.data.title,
+      },
+    })),
+  },
+};
+
+const breadcrumbLd = {
+  '@type': 'BreadcrumbList',
+  '@id': `${catUrl}#breadcrumb`,
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Blog', item: hubUrl },
+    { '@type': 'ListItem', position: 2, name: label, item: catUrl },
+  ],
+};
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    organizationLd,
+    {
+      '@type': 'WebSite',
+      '@id': webSiteId,
+      url: siteHomeUrl,
+      name: 'AIChatSEO Blog',
+      publisher: { '@id': SCHEMA_PUBLISHER_ORG_ID },
+    },
+    {
+      '@type': 'Blog',
+      '@id': blogId,
+      name: 'AIChatSEO Blog',
+      url: hubUrl,
+      publisher: { '@id': SCHEMA_PUBLISHER_ORG_ID },
+      isPartOf: { '@id': webSiteId },
+    },
+    listLd,
+    breadcrumbLd,
+  ],
+};
+
+setBlogCacheHeaders(Astro.response.headers);
+---
+
+<Layout title={pageTitle} description={pageDescription} keywords={[label, 'AIChatSEO', 'SEO blog']} jsonLd={jsonLd}>
+  <div class="fixed inset-0 z-[-1] pointer-events-none gradient-mesh"></div>
+
+  <div class="relative z-10 px-4 pb-16 pt-12 md:pt-20">
+    <main class="container mx-auto max-w-6xl">
+      <nav class="mb-8 text-sm text-slate-500" aria-label="Breadcrumb">
+        <a href={`${BLOG_HUB_PATH}/`} class="font-medium text-sky-700 hover:underline">Blog</a>
+        <span class="mx-2" aria-hidden="true">/</span>
+        <span class="text-slate-800">{label}</span>
+      </nav>
+
+      <header class="mb-12 max-w-3xl">
+        <h1 class="text-4xl font-extrabold tracking-tight text-slate-800 md:text-5xl">
+          {label}
+        </h1>
+        <p class="mt-4 text-lg text-slate-600">
+          {pageDescription}
+        </p>
+      </header>
+
+      {allPosts.length === 0 ? (
+        <div class="rounded-[2rem] border border-slate-200 bg-white p-10 text-center shadow-[0_18px_50px_-36px_rgba(15,23,42,0.28)]">
+          <p class="text-slate-600">No articles in this hub yet.</p>
+          <a href={`${BLOG_HUB_PATH}/`} class="mt-4 inline-block font-medium text-sky-700 hover:underline">Back to all posts</a>
+        </div>
+      ) : (
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {allPosts.map((post) => {
+            const slug = blogEntrySlug(post);
+            const cover = post.data.coverImage?.trim();
+            const minRead = readingTimeMinutesFromMarkdown(post.body);
+            const cardExcerpt = post.data.excerpt?.trim() || post.data.description;
+            return (
+              <a
+                href={blogPostPath(slug)}
+                class="group flex h-full min-h-[380px] flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1.5 hover:border-[#8ccdeb] hover:shadow-[0_24px_60px_-34px_rgba(15,23,42,0.34)]"
+              >
+                {cover ? (
+                  <div class="relative aspect-[16/10] w-full overflow-hidden">
+                    <img
+                      src={cover}
+                      alt={post.data.title || 'Blog Image'}
+                      class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div class="absolute left-4 top-4 flex items-center gap-1 rounded-full border border-white/60 bg-white/88 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-800 shadow-sm backdrop-blur-md">
+                      {minRead} min
+                    </div>
+                  </div>
+                ) : (
+                  <div class="relative flex aspect-[16/10] w-full shrink-0 items-center justify-center bg-gradient-to-br from-sky-100 to-slate-100">
+                    <div class="absolute left-4 top-4 rounded-full border border-white/60 bg-white/88 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-800">
+                      {minRead} min
+                    </div>
+                    <span class="text-3xl font-black text-sky-300/90" aria-hidden="true">AI</span>
+                  </div>
+                )}
+                <div class="flex flex-grow flex-col p-5 md:p-6">
+                  <h2 class="mb-3 line-clamp-3 text-xl font-bold text-slate-800 transition-colors group-hover:text-sky-600">
+                    {post.data.title}
+                  </h2>
+                  <p class="mb-6 flex-grow text-sm leading-6 text-slate-500 line-clamp-3">{cardExcerpt}</p>
+                  <span class="text-xs font-bold uppercase tracking-[0.16em] text-sky-500">Read article →</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      )}
+    </main>
+  </div>
+</Layout>

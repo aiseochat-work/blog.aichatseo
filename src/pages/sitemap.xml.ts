@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
-import { desc } from 'drizzle-orm';
-import { db, ensureDatabaseReady } from '../db';
-import { posts } from '../db/schema';
+import { getCollection } from 'astro:content';
+import { blogEntrySlug, blogPostPath, BLOG_HUB_PATH, blogCategoryPath } from '../lib/blog-slug';
+import { BLOG_CATEGORY_SLUGS } from '../lib/blog-categories';
 import { absoluteUrl } from '../lib/site-url';
 
 function escapeXml(value: string) {
@@ -27,20 +27,24 @@ function urlEntry(loc: string, lastmod?: Date, priority = '0.7') {
 }
 
 export const GET: APIRoute = async () => {
-  await ensureDatabaseReady();
-  const allPosts = await db
-    .select({
-      slug: posts.slug,
-      updatedAt: posts.updatedAt,
-      createdAt: posts.createdAt,
-    })
-    .from(posts)
-    .orderBy(desc(posts.updatedAt));
+  const allPosts = (await getCollection('blog')).sort(
+    (a, b) => (b.data.updatedDate ?? b.data.pubDate).valueOf() - (a.data.updatedDate ?? a.data.pubDate).valueOf()
+  );
+
+  const latestPostMod = allPosts[0]
+    ? allPosts[0].data.updatedDate ?? allPosts[0].data.pubDate
+    : undefined;
 
   const entries = [
-    urlEntry(absoluteUrl('/'), allPosts[0]?.updatedAt, '1.0'),
+    urlEntry(absoluteUrl('/'), latestPostMod, '1.0'),
+    urlEntry(absoluteUrl(`${BLOG_HUB_PATH}/`), latestPostMod, '1.0'),
+    ...BLOG_CATEGORY_SLUGS.map((cat) => urlEntry(absoluteUrl(blogCategoryPath(cat)), latestPostMod, '0.75')),
     ...allPosts.map((post) =>
-      urlEntry(absoluteUrl(`/blog/${post.slug}`), post.updatedAt || post.createdAt, '0.8')
+      urlEntry(
+        absoluteUrl(blogPostPath(blogEntrySlug(post))),
+        post.data.updatedDate ?? post.data.pubDate,
+        '0.8'
+      )
     ),
   ];
 

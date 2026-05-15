@@ -1,37 +1,32 @@
 # AIChatSEO Blog
 
-Astro blog for `https://blog.aichatseo.com`, deployed on Cloudflare Workers with Neon Postgres and Drizzle.
+Astro blog for `https://blog.aichatseo.com`, deployed on Cloudflare Workers. Posts are **static** Markdown/MDX files in `src/content/blog/` (no database).
 
-## Required Environment
+## Environment
 
-Copy `env.sample` locally and configure these values in Cloudflare:
+Copy `env.sample` locally if you need overrides. For Cloudflare, set:
 
-- `DATABASE_URL`: Neon Postgres connection string.
-- `PUBLIC_SITE_URL`: `https://blog.aichatseo.com`.
-- `SEED_TOKEN`: Optional. Required to use `/seed` outside local development.
+- `PUBLIC_SITE_URL`: `https://blog.aichatseo.com` (also set in `wrangler.jsonc` as needed).
 
 ## Commands
-
 
 ```sh
 npm install
 npm run dev
 npm run build
-npm run db:generate
-npm run db:migrate
+npm run deploy
 ```
 
-## Database
+## Writing posts
 
-Run `npm run db:migrate` for normal deploys. The app also performs an idempotent schema bootstrap before blog queries so a fresh Cloudflare deployment does not fail if the `posts` table has not been created yet.
+Add `.md` or `.mdx` files under `src/content/blog/`. Frontmatter is validated in `src/content/config.ts` (title, description, `pubDate`, optional `category` for hub pages, tags, cover image, etc.). The URL slug comes from the filename (e.g. `traffic-drop-search-console.mdx` → `/blogs/traffic-drop-search-console/`).
 
+**Note:** Topic hub routes use `/blogs/{category}/` (for example `/blogs/google-search-console/`). Avoid creating a post whose **filename/slug equals a `category` id**, or that topic index will be overwritten at build time.
 
-The protected seed utility is available at `/seed?token=YOUR_SEED_TOKEN`. It inserts or refreshes sample posts and is disabled in production without a valid token.
+**Hub:** all posts live under **`/blogs/`** with optional topic indexes at **`/blogs/{category}/`** (see `src/lib/blog-categories.ts`). The site root **`/`** redirects to **`/blogs/`**. Legacy **`/blog/*`** URLs redirect to **`/blogs/*`** via `public/_redirects` on Cloudflare.
 
 ## Cloudflare Notes
 
-Blog pages use edge caching with a short CDN TTL and long stale-while-revalidate window:
+Pages use edge caching with a short CDN TTL and long stale-while-revalidate window:
 
 `public, max-age=0, s-maxage=300, stale-while-revalidate=86400`
-
-This keeps repeat visits fast without pinning old DB content at the edge for a year.

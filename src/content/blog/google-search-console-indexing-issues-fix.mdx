@@ -1,0 +1,143 @@
+---
+title: "How to Fix Google Search Console Indexing Issues (Complete Guide)"
+category: "technical-seo"
+description: "Diagnose and fix common Google Search Console indexing statuses—from “crawled not indexed” to canonical mistakes—with a practical technical SEO workflow."
+excerpt: "Indexing errors look scary in Search Console, but most fall into a handful of patterns. Here’s how to read the signals, fix root causes, and verify recovery."
+metaDescription: "Learn how to diagnose and fix Google Search Console indexing issues including crawled but not indexed, discovered but not indexed, canonical problems, and sitemap errors."
+author: "AIChatSEO Team"
+pubDate: 2026-05-23
+tags:
+  - "Technical SEO"
+  - "Indexing"
+  - "Google Search Console"
+seoKeywords:
+  - "google search console indexing issues"
+  - "crawled currently not indexed"
+  - "discovered currently not indexed"
+  - "gsc canonical issues"
+---
+
+Indexing statuses in Google Search Console are not moral judgments—they are **machine-readable explanations** of where a URL sits in Google’s crawl/index pipeline. Your job is to translate the status into **an engineerable fix**, then revalidate.
+
+---
+
+## What Indexing Issues Mean
+
+When a URL is not indexed—or indexed differently than you expect—something in **discovery, crawl, rendering, quality evaluation, or canonicalization** disagrees with your assumptions. Start with the *Indexing* reports and drill into **example URLs** for patterns.
+
+---
+
+## Common GSC Indexing Errors
+
+You will repeatedly see:
+
+- Excluded by `noindex`
+- Alternate page with proper canonical tag
+- Crawled – currently not indexed
+- Discovered – currently not indexed
+- Duplicate without user-selected canonical
+- Soft 404
+- Page with redirect
+- Server errors (5xx) and fetch anomalies
+
+Treat counts as **prioritization**, not panic—sample URLs matter more than totals.
+
+---
+
+## Crawled — Currently Not Indexed
+
+Google **fetched** the URL but chose **not** to index it. Common drivers include **perceived duplication**, **thin or boilerplate value**, **low differential utility vs other URLs**, or **site-wide quality signals**.
+
+**Fixes (pattern-dependent):**
+
+- Differentiate content where multiple URLs answer the same intent.
+- Improve depth, E‑E‑A‑T signals, and internal links from authoritative hubs.
+- Consolidate near-duplicates and canonicalize thoughtfully.
+- Address thin parameter or facet URLs at template level.
+
+---
+
+## Discovered — Currently Not Indexed
+
+Google knows the URL exists but **has not crawled** it yet—or deprioritized crawl. Check **internal links**, **sitemap hygiene**, **crawl depth**, and whether robots/noindex/navigation accidentally strands URLs.
+
+---
+
+## Canonicalization Problems
+
+If Google selects an unexpected canonical, verify:
+
+- **Consistent** canonical tags and internal link destinations.
+- **HTTPS** preference and hostname consistency (`www` vs apex).
+- **Parameter handling** and faceted navigation rules.
+- Hreflang and regional variants **not fighting** primary canonicals.
+
+---
+
+## Noindex Mistakes
+
+Staging tokens, CMS checkboxes, “discourage search engines” settings, and **accidental robots meta** on templates are classic slip-ups. Diff templates after releases; compare HTML source, not just the visual page.
+
+---
+
+## Sitemap Issues
+
+Sitemaps should list **canonical, 200-status URLs** you want discovered—not every parameterized evergreen. Watch for:
+
+- Massive stale URLs
+- 404/410 chains
+- Non-canonical locations
+- Segmented sitemaps without clear ownership
+
+---
+
+## Internal Linking Fixes
+
+Weak pages often lack **paths from pages Google already trusts**. Add **contextual** links from relevant parents; avoid sitewide footer dumps as your only strategy.
+
+---
+
+## Technical SEO Troubleshooting
+
+Bring in server logs or CDN analytics **only after** URL-level patterns emerge—otherwise you drown in noise. Standard sequence:
+
+1. Identify cohort (template, directory, brand vs non-brand).
+2. Confirm HTTP/HTML reality (status, redirects, canonical, robots).
+3. Patch template or policy—**not just one URL**.
+4. Request validation / retest in GSC where available.
+5. Monitor the same cohort week over week.
+
+---
+
+## How AIChatSEO Helps Detect Visibility Problems Faster
+
+Instead of re-exporting URL lists, ask conversational questions over your connected Search Console data—**which templates had indexing exclusions spike after a release**, whether **CTR collapsed on indexed URLs**, or how queries shifted on affected directories. Pair with engineering fixes; AI should **accelerate triage**, not replace code reviews.
+
+Explore **[traffic drop analysis](https://www.aichatseo.com/traffic-drop-analysis)** when indexing issues coincide with clicks loss, and **[Google Search Console chat](https://www.aichatseo.com/google-search-console-chat)** for question-driven triage.
+
+### Lead magnet idea
+
+Many teams want a paper checklist for releases—**Technical SEO Checklist PDF** (changelog prompts, robots/canonical/sitemap checks) pairs well with this article for email capture on the marketing site.
+
+---
+
+## Related Reading
+
+- [Traffic drop in Google Search Console](/blogs/traffic-drop-search-console)
+- [Why did my organic traffic drop?](/blogs/why-did-my-organic-traffic-drop)
+
+---
+
+## Frequently Asked Questions
+
+### How long until indexing recovers after a fix?
+
+It varies by site authority, crawl demand, and scope. Small fixes can improve in days; **template-level** issues may take multiple recrawl cycles.
+
+### Should I “Request indexing” for every URL?
+
+No—use it for **strategic** URLs or after meaningful fixes. Bulk requests do not shortcut quality evaluation.
+
+### Does “indexed” guarantee traffic?
+
+No. Indexing is **eligibility** to rank; relevance, competition, SERP layout, and intent fit still govern clicks.

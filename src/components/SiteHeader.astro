@@ -1,11 +1,11 @@
 ---
 const MARKETING = 'https://www.aichatseo.com';
 const path = Astro.url.pathname;
-const blogActive = path === '/' || path.startsWith('/blog');
+const blogActive = path.startsWith('/blogs') || path === '/';
 
 const navLinks = [
   { label: 'Features', href: `${MARKETING}/#features` },
-  { label: 'Blog',     href: '/',                        active: blogActive },
+  { label: 'Blog',     href: '/blogs/',                  active: blogActive },
   { label: 'Pricing',  href: `${MARKETING}/pricing` },
   { label: 'About',    href: `${MARKETING}/about` },
 ];
