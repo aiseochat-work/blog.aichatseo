@@ -10,7 +10,7 @@ await ensureDatabaseReady();
 const allPosts = await db.select().from(posts).orderBy(descOrder(posts.createdAt));
 
 const pageDescription =
-  'Search insights, product notes, and practical SEO thinking. Tactical breakdowns on content decay, Search Console workflows, reporting clarity, and the product decisions behind AIChatSEO.';
+  'Learn how to analyze Google Search Console data with AI. Insights on traffic drops, content decay, and automated SEO analysis. The official blog for AIChatSEO, the ultimate GSC chatbot.';
 
 const websiteLd = {
   '@context': 'https://schema.org',
@@ -68,8 +68,6 @@ setBlogCacheHeaders(Astro.response.headers);
   jsonLd={[websiteLd, itemListLd]}
   googleSiteVerification="P5UdfSYTpwMutruALFkfTCe4vo4il6SHc2eyts-5MsY"
 >
-  <div class="fixed inset-0 z-[-1] pointer-events-none gradient-mesh"></div>
-
   <div class="relative z-10 px-4 pb-16 pt-12 md:pt-20">
     <main class="container mx-auto max-w-6xl">
       <section class="my-14 overflow-hidden rounded-[2.5rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.9),rgba(244,251,255,0.9))] px-6 py-10 shadow-[0_26px_80px_-44px_rgba(15,23,42,0.34)] backdrop-blur-xl md:px-10 md:py-14">
@@ -79,12 +77,10 @@ setBlogCacheHeaders(Astro.response.headers);
               Editorial
             </div>
             <h1 class="text-4xl font-extrabold tracking-tight text-slate-800 md:text-6xl">
-              Search insights, product notes, and practical SEO thinking.
+              Understand why your Google Search Console traffic dropped.
             </h1>
             <p class="max-w-2xl text-base leading-7 text-slate-500 md:text-lg">
-              This is where we publish tactical breakdowns on content decay,
-              Search Console workflows, reporting clarity, and the product
-              decisions behind AIChatSEO.
+              Tactical breakdowns on how to analyze Google Search Console data with AI, spotting content decay, and using our GSC chatbot for better search rankings.
             </p>
           </div>
 

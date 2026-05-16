@@ -1,0 +1,51 @@
+<svg viewBox="0 0 100 100" width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <mask id="arrow-mask-app">
+      <rect width="100%" height="100%" fill="white" />
+      <path
+        d="M 50 24 L 68 54 L 54 48 L 50 98 L 46 48 L 32 54 Z"
+        fill="black"
+        transform="rotate(45, 50, 50)"
+        stroke="black"
+        stroke-width="6"
+        stroke-linejoin="round"
+      />
+    </mask>
+    <filter id="logo-icon-shadow" x="-8%" y="-8%" width="116%" height="116%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#64748b" flood-opacity="0.14" />
+    </filter>
+  </defs>
+
+  <rect
+    width="90"
+    height="90"
+    x="5"
+    y="5"
+    rx="20"
+    fill="#ffffff"
+    stroke="#d7ecf6"
+    stroke-width="1"
+    filter="url(#logo-icon-shadow)"
+  />
+
+  <g transform="translate(15, 15) scale(0.7)">
+    <circle
+      cx="50"
+      cy="50"
+      r="34"
+      fill="none"
+      stroke="#0f172a"
+      stroke-width="7"
+      pathLength="100"
+      stroke-dasharray="21 4"
+      stroke-dashoffset="23"
+      mask="url(#arrow-mask-app)"
+      stroke-linecap="butt"
+    />
+    <path
+      d="M 50 24 L 68 54 L 54 48 L 50 98 L 46 48 L 32 54 Z"
+      fill="#80c4e9"
+      transform="rotate(45, 50, 50)"
+    />
+  </g>
+</svg>

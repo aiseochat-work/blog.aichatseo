@@ -81,11 +81,18 @@ const jsonLdBlocks = jsonLd
     }
   </head>
   <body
-    class="flex min-h-screen flex-col antialiased selection:bg-sky-200/80 selection:text-slate-900"
+    class="flex min-h-dvh flex-col antialiased selection:bg-[#80c4e9]/30 selection:text-slate-900 bg-slate-50 relative"
   >
-    <div class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.22),transparent_32rem),linear-gradient(180deg,#f8fafc_0%,#eaf6f9_42%,#ffffff_100%)]" aria-hidden="true" />
+    <!-- Background Ambient Meshes -->
+    <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
+      <div class="absolute -top-[20%] -left-[10%] h-[70%] w-[50%] rounded-full bg-sky-200/40 blur-[120px]" />
+      <div class="absolute top-[20%] -right-[10%] h-[60%] w-[40%] rounded-full bg-blue-100/50 blur-[120px]" />
+      <div class="absolute -bottom-[20%] left-[20%] h-[60%] w-[50%] rounded-full bg-sky-100/40 blur-[100px]" />
+      <div class="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.4),rgba(255,255,255,0.8)_100%)]" />
+    </div>
+    
     <SiteHeader />
-    <div class="flex-1">
+    <div class="flex-1 relative z-0">
       <slot />
     </div>
     <SiteFooter />
