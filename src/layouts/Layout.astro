@@ -116,7 +116,7 @@ const jsonLdBlocks = jsonLd
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap"
       rel="stylesheet"
     />
     {
@@ -126,14 +126,15 @@ const jsonLdBlocks = jsonLd
     }
   </head>
   <body
-    class="flex min-h-dvh flex-col antialiased selection:bg-[#80c4e9]/30 selection:text-slate-900 bg-slate-50 relative"
+    class="relative flex min-h-dvh flex-col bg-[#f5fbff] antialiased selection:bg-[#80c4e9]/30 selection:text-slate-900"
   >
     <!-- Background Ambient Meshes -->
     <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
       <div class="absolute -top-[20%] -left-[10%] h-[70%] w-[50%] rounded-full bg-sky-200/40 blur-[120px]" />
       <div class="absolute top-[20%] -right-[10%] h-[60%] w-[40%] rounded-full bg-blue-100/50 blur-[120px]" />
       <div class="absolute -bottom-[20%] left-[20%] h-[60%] w-[50%] rounded-full bg-sky-100/40 blur-[100px]" />
-      <div class="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.4),rgba(255,255,255,0.8)_100%)]" />
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.52),transparent_48%),linear-gradient(to_bottom,rgba(255,255,255,0.44),rgba(255,255,255,0.86)_100%)]" />
+      <div class="absolute inset-0 opacity-[0.33] [background-image:linear-gradient(rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px)] [background-size:72px_72px]" />
     </div>
     
     <SiteHeader />
@@ -156,16 +157,42 @@ const jsonLdBlocks = jsonLd
   :root {
     --ink: 15 23 42;
     --muted: 100 116 139;
+    --surface: 255 255 255;
+    --line: 203 213 225;
   }
   html {
     font-family:
-      'Inter',
+      'Manrope',
       system-ui,
       -apple-system,
       Segoe UI,
       Roboto,
       sans-serif;
     color: rgb(var(--ink));
+    background: #f5fbff;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    text-rendering: optimizeLegibility;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-wrap: balance;
+  }
+  p,
+  li,
+  blockquote {
+    text-wrap: pretty;
+  }
+  .font-editorial {
+    font-family:
+      'Source Serif 4',
+      Georgia,
+      serif;
   }
   code {
     font-family:
