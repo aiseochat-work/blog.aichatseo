@@ -1,0 +1,308 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { readingTimeMinutesFromMarkdown, wordCountFromMarkdown } from '../../lib/reading-time';
+import { setBlogCacheHeaders } from '../../lib/cache';
+import { absoluteUrl, canonicalFromRequest, SCHEMA_PUBLISHER_ORG_ID, blogDocumentBase, schemaBlogId, schemaWebSiteId } from '../../lib/site-url';
+import { blogEntrySlug, blogHubAbsoluteUrl, BLOG_HUB_PATH } from '../../lib/blog-slug';
+import { parseFaqsFromMarkdown } from '../../lib/parse-faq-from-markdown';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post) => ({
+    params: { slug: blogEntrySlug(post) },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const DEFAULT_AUTHOR = 'AIChatSEO Team';
+
+const articleDesc =
+  post.data.metaDescription?.trim() ||
+  post.data.excerpt?.trim() ||
+  post.data.description.trim() ||
+  `${post.data.title} — insights from the AIChatSEO blog.`;
+
+const cover = post.data.coverImage?.trim();
+const ogImage = cover ? absoluteUrl(cover) : undefined;
+
+const publishedIso = post.data.pubDate.toISOString();
+const modifiedIso = (post.data.updatedDate ?? post.data.pubDate).toISOString();
+const authorName = post.data.author?.trim() || DEFAULT_AUTHOR;
+const readMins = readingTimeMinutesFromMarkdown(post.body);
+const articleUrl = canonicalFromRequest(Astro.url);
+const postTags = post.data.tags?.filter(Boolean) || [];
+const extraSeo = post.data.seoKeywords?.filter(Boolean) || [];
+const metaKeywordList = [...new Set([...postTags, ...extraSeo])];
+
+const siteHomeUrl = blogDocumentBase();
+const blogHubUrl = blogHubAbsoluteUrl();
+const logoUrl = absoluteUrl('/favicon.svg');
+const blogId = schemaBlogId();
+const webSiteId = schemaWebSiteId();
+const articleNodeId = `${articleUrl}#article`;
+
+const organizationLd = {
+  '@type': 'Organization',
+  '@id': SCHEMA_PUBLISHER_ORG_ID,
+  name: 'AIChatSEO',
+  url: 'https://www.aichatseo.com',
+  logo: {
+    '@type': 'ImageObject',
+    url: logoUrl,
+  },
+};
+
+const webSiteStubLd = {
+  '@type': 'WebSite',
+  '@id': webSiteId,
+  url: siteHomeUrl,
+  name: 'AIChatSEO Blog',
+  publisher: { '@id': SCHEMA_PUBLISHER_ORG_ID },
+};
+
+const blogStubLd = {
+  '@type': 'Blog',
+  '@id': blogId,
+  name: 'AIChatSEO Blog',
+  url: blogHubUrl,
+  publisher: { '@id': SCHEMA_PUBLISHER_ORG_ID },
+  isPartOf: { '@id': webSiteId },
+};
+
+const webPageLd = {
+  '@type': 'WebPage',
+  '@id': articleUrl,
+  url: articleUrl,
+  name: post.data.title,
+  description: articleDesc,
+  inLanguage: 'en-US',
+  isPartOf: { '@id': blogId },
+  publisher: { '@id': SCHEMA_PUBLISHER_ORG_ID },
+};
+
+const articleLd = {
+  '@type': 'BlogPosting',
+  '@id': articleNodeId,
+  headline: post.data.title,
+  description: articleDesc,
+  url: articleUrl,
+  mainEntityOfPage: { '@id': articleUrl },
+  isPartOf: { '@id': blogId },
+  datePublished: publishedIso,
+  dateModified: modifiedIso,
+  author: { '@type': 'Person', name: authorName },
+  publisher: { '@id': SCHEMA_PUBLISHER_ORG_ID },
+  image: ogImage ? [ogImage] : [logoUrl],
+  articleSection: postTags[0] || 'SEO',
+  ...(metaKeywordList.length > 0 ? { keywords: metaKeywordList } : {}),
+  wordCount: wordCountFromMarkdown(post.body),
+  timeRequired: `PT${readMins}M`,
+};
+
+const breadcrumbLd = {
+  '@type': 'BreadcrumbList',
+  '@id': `${articleUrl}#breadcrumb`,
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: 'Blog',
+      item: blogHubUrl,
+    },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: post.data.title,
+      item: articleUrl,
+    },
+  ],
+};
+
+const graph: Record<string, unknown>[] = [
+  organizationLd,
+  webSiteStubLd,
+  blogStubLd,
+  webPageLd,
+  articleLd,
+  breadcrumbLd,
+];
+
+const explicitFaqs = post.data.faqs?.filter((f) => f.question?.trim() && f.answer?.trim());
+const parsedFaqs = parseFaqsFromMarkdown(post.body);
+/** Frontmatter wins if set; otherwise auto-detect `## FAQ` / `## Frequently Asked Questions` + `###` pairs in the body. */
+const faqsForSchema = explicitFaqs?.length ? explicitFaqs : parsedFaqs;
+if (faqsForSchema.length) {
+  graph.push({
+    '@type': 'FAQPage',
+    '@id': `${articleUrl}#faq`,
+    mainEntity: faqsForSchema.map((f) => ({
+      '@type': 'Question',
+      name: f.question.trim(),
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: f.answer.trim(),
+      },
+    })),
+  });
+}
+
+if (post.data.softwareApplicationSchema) {
+  graph.push({
+    '@type': 'SoftwareApplication',
+    '@id': `${articleUrl}#software`,
+    name: 'AIChatSEO',
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    description: articleDesc,
+    url: 'https://www.aichatseo.com',
+    publisher: { '@id': SCHEMA_PUBLISHER_ORG_ID },
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+      description: 'Free tier available; paid plans for teams.',
+    },
+  });
+}
+
+const howTo = post.data.howTo;
+if (howTo?.steps?.length) {
+  graph.push({
+    '@type': 'HowTo',
+    '@id': `${articleUrl}#howto`,
+    name: howTo.name,
+    ...(howTo.description ? { description: howTo.description } : {}),
+    step: howTo.steps.map((s, i) => ({
+      '@type': 'HowToStep',
+      position: i + 1,
+      name: s.name,
+      text: s.text,
+    })),
+  });
+}
+
+const articleJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': graph,
+};
+
+const deck = post.data.excerpt?.trim() || post.data.description;
+const categorySlug = post.data.category;
+const categoryHref = categorySlug ? `${BLOG_HUB_PATH}/${categorySlug}/` : undefined;
+
+setBlogCacheHeaders(Astro.response.headers);
+---
+
+<Layout
+  title={`${post.data.title} | AIChatSEO`}
+  description={articleDesc}
+  ogImage={ogImage}
+  ogImageAlt={cover ? `Featured image: ${post.data.title}` : post.data.title}
+  ogType="article"
+  articlePublishedTime={publishedIso}
+  articleModifiedTime={modifiedIso}
+  articleTags={postTags}
+  keywords={metaKeywordList}
+  author={authorName}
+  jsonLd={articleJsonLd}
+>
+  <main class="mx-auto max-w-4xl px-4 pb-24 pt-6 sm:px-6 sm:pt-10">
+    <article class="flex flex-col items-center">
+      <header class="mb-16 flex w-full flex-col items-center justify-center text-center">
+        <div class="mb-8 flex w-full flex-wrap items-center justify-start gap-3">
+          <a
+            href={`${BLOG_HUB_PATH}/`}
+            class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            Back to blogs
+          </a>
+          {categoryHref && (
+            <a
+              href={categoryHref}
+              class="inline-flex items-center rounded-full border border-[#80c4e9]/30 bg-[#80c4e9]/10 px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#3b7597] transition-colors hover:bg-[#80c4e9]/20"
+            >
+              Topic hub
+            </a>
+          )}
+        </div>
+
+        <p class="inline-block rounded-full border border-[#80c4e9]/20 bg-[#80c4e9]/10 px-4 py-1.5 text-xs font-mono uppercase tracking-widest text-[#3b7597] mb-6">
+          {new Date(post.data.pubDate).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          })}
+          {' • '}
+          {readMins} min read
+        </p>
+
+        <h1 class="mb-8 text-4xl font-extrabold leading-tight tracking-tight text-slate-800 md:text-5xl lg:text-7xl">
+          {post.data.title}
+        </h1>
+
+        <p class="max-w-2xl text-lg font-medium leading-relaxed text-slate-600 lg:text-xl">
+          {deck}
+        </p>
+
+        <div class="flex flex-row gap-3 mt-8 items-center">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 border border-slate-200">
+            <span class="text-slate-500 font-bold text-lg">{authorName[0]}</span>
+          </div>
+          <div class="text-sm text-left">
+            <p class="text-slate-900 font-bold text-base">
+              {authorName}
+            </p>
+            <p class="text-slate-500 font-mono uppercase tracking-widest text-[10px] mt-1">
+              Author
+            </p>
+          </div>
+        </div>
+
+        {cover && (
+          <div class="relative w-full max-w-4xl h-[300px] lg:h-[500px] mt-12 lg:mt-16 rounded-xl overflow-hidden shadow-lg">
+            <img
+              src={cover}
+              alt={post.data.title}
+              class="h-full w-full object-cover"
+            />
+          </div>
+        )}
+      </header>
+
+      <div class="flex w-full flex-col gap-6 rounded-[2rem] border border-slate-200 bg-white/80 px-6 py-6 shadow-[0_18px_50px_-38px_rgba(15,23,42,0.28)] backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-row flex-wrap gap-2">
+          {postTags.map((tag) => (
+            <div class="flex items-center justify-center text-[10px] lg:text-xs px-3 py-1 rounded-full text-sky-700 bg-sky-100/50 border border-sky-200/50 font-mono tracking-widest uppercase shadow-[0_0_10px_rgba(46,64,54,0.05)]">
+              {tag}
+            </div>
+          ))}
+        </div>
+
+        <div class="flex items-center gap-2">
+           <button type="button" class="inline-flex h-9 items-center justify-center rounded-md border border-slate-200 bg-white px-3 text-sm font-medium shadow-sm transition-colors hover:bg-slate-100 hover:text-slate-900">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+              Share
+           </button>
+        </div>
+      </div>
+
+      <div class="py-12 lg:py-16 w-full prose prose-slate prose-lg max-w-none prose-headings:font-bold prose-a:text-sky-600 hover:prose-a:text-sky-800 prose-img:rounded-xl">
+        <Content />
+      </div>
+    </article>
+
+    <footer class="mt-16 border-t border-slate-200 pt-10">
+      <p class="text-center text-sm text-slate-500">
+        Questions about Search Console workflows or conversational SEO?{' '}
+        <a href="https://www.aichatseo.com/sign-up" class="font-medium text-sky-700 hover:underline">
+          Start free on AIChatSEO
+        </a>
+      </p>
+    </footer>
+  </main>
+</Layout>

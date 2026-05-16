@@ -1,0 +1,315 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import { setBlogCacheHeaders } from '../../lib/cache';
+import { blogEntrySlug, blogHubAbsoluteUrl, blogPostPath, blogCategoryPath } from '../../lib/blog-slug';
+import {
+  SCHEMA_PUBLISHER_ORG_ID,
+  absoluteUrl,
+  blogDocumentBase,
+  schemaBlogId,
+  schemaWebSiteId,
+} from '../../lib/site-url';
+import { readingTimeMinutesFromMarkdown } from '../../lib/reading-time';
+import { BLOG_CATEGORY_SLUGS, BLOG_CATEGORY_LABELS } from '../../lib/blog-categories';
+
+const allPosts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+
+const pageDescription =
+  'Search insights, product notes, and practical SEO thinking. Tactical breakdowns on content decay, Search Console workflows, reporting clarity, and the product decisions behind AIChatSEO.';
+
+const siteHomeUrl = blogDocumentBase();
+const hubUrl = blogHubAbsoluteUrl();
+const logoUrl = absoluteUrl('/favicon.svg');
+const webSiteId = schemaWebSiteId();
+const blogId = schemaBlogId();
+
+const organizationLd = {
+  '@type': 'Organization',
+  '@id': SCHEMA_PUBLISHER_ORG_ID,
+  name: 'AIChatSEO',
+  url: 'https://www.aichatseo.com',
+  logo: {
+    '@type': 'ImageObject',
+    url: logoUrl,
+  },
+};
+
+const webSiteLd = {
+  '@type': 'WebSite',
+  '@id': webSiteId,
+  url: siteHomeUrl,
+  name: 'AIChatSEO Blog',
+  description: pageDescription,
+  inLanguage: 'en-US',
+  publisher: { '@id': SCHEMA_PUBLISHER_ORG_ID },
+};
+
+const blogPostSummaries = allPosts.map((post) => ({
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  url: absoluteUrl(blogPostPath(blogEntrySlug(post))),
+  datePublished: post.data.pubDate.toISOString(),
+  dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
+  author: {
+    '@type': 'Person',
+    name: post.data.author?.trim() || 'AIChatSEO Team',
+  },
+  keywords: post.data.tags?.length ? post.data.tags : undefined,
+}));
+
+const blogLd = {
+  '@type': 'Blog',
+  '@id': blogId,
+  name: 'AIChatSEO Blog',
+  url: hubUrl,
+  description: pageDescription,
+  publisher: { '@id': SCHEMA_PUBLISHER_ORG_ID },
+  isPartOf: { '@id': webSiteId },
+  blogPost: blogPostSummaries,
+};
+
+const itemListLd = {
+  '@type': 'ItemList',
+  name: 'AIChatSEO Blog Posts',
+  numberOfItems: allPosts.length,
+  itemListElement: allPosts.map((post, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    item: {
+      '@type': 'BlogPosting',
+      url: absoluteUrl(blogPostPath(blogEntrySlug(post))),
+      name: post.data.title,
+    },
+  })),
+};
+
+const homeJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [organizationLd, webSiteLd, blogLd, itemListLd],
+};
+
+const categoriesSet = new Set<string>();
+allPosts.forEach((post) => {
+  post.data.tags?.forEach((tag) => {
+    if (tag) categoriesSet.add(tag);
+  });
+});
+const tagTopics = Array.from(categoriesSet).sort();
+
+const siteKeywords = [
+  'AIChatSEO',
+  'SEO blog',
+  'Google Search Console',
+  'organic search',
+  'conversational SEO',
+  'search analytics',
+  ...tagTopics,
+];
+
+setBlogCacheHeaders(Astro.response.headers);
+---
+
+<Layout
+  title="Blog | AIChatSEO"
+  description={pageDescription}
+  keywords={siteKeywords}
+  jsonLd={homeJsonLd}
+  googleSiteVerification="P5UdfSYTpwMutruALFkfTCe4vo4il6SHc2eyts-5MsY"
+>
+  <div class="fixed inset-0 z-[-1] pointer-events-none gradient-mesh"></div>
+
+  <div class="relative z-10 px-4 pb-16 pt-12 md:pt-20">
+    <main class="container mx-auto max-w-6xl">
+      <section class="my-14 overflow-hidden rounded-[2.5rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.9),rgba(244,251,255,0.9))] px-6 py-10 shadow-[0_26px_80px_-44px_rgba(15,23,42,0.34)] backdrop-blur-xl md:px-10 md:py-14">
+        <div class="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+          <div class="max-w-3xl space-y-5">
+            <div class="inline-flex rounded-full border border-[#80c4e9]/20 bg-[#80c4e9]/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#3b7597] md:text-xs">
+              Editorial
+            </div>
+            <h1 class="text-4xl font-extrabold tracking-tight text-slate-800 md:text-6xl">
+              Search insights, product notes, and practical SEO thinking.
+            </h1>
+            <p class="max-w-2xl text-base leading-7 text-slate-500 md:text-lg">
+              This is where we publish tactical breakdowns on content decay,
+              Search Console workflows, reporting clarity, and the product
+              decisions behind AIChatSEO.
+            </p>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+            <div class="rounded-[1.75rem] border border-white/70 bg-white/80 p-5">
+              <div class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#3b7597]">
+                Articles
+              </div>
+              <div class="mt-2 text-3xl font-bold text-slate-800">
+                {allPosts.length}
+              </div>
+            </div>
+            <div class="rounded-[1.75rem] border border-white/70 bg-white/80 p-5">
+              <div class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#3b7597]">
+                Topic hubs
+              </div>
+              <div class="mt-2 text-3xl font-bold text-slate-800">
+                {BLOG_CATEGORY_SLUGS.length}
+              </div>
+            </div>
+            <div class="rounded-[1.75rem] border border-white/70 bg-white/80 p-5">
+              <div class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#3b7597]">
+                Focus
+              </div>
+              <div class="mt-2 text-base font-semibold text-slate-800">
+                Search Console-native workflows
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-12 w-full">
+        <div class="rounded-[2rem] border border-slate-200 bg-white px-5 py-6 shadow-[0_18px_50px_-36px_rgba(15,23,42,0.28)] md:px-8">
+          <h2 class="text-[11px] font-bold uppercase tracking-[0.18em] text-[#3b7597]">
+            Browse by topic
+          </h2>
+          <p class="mt-2 max-w-2xl text-sm text-slate-500">
+            Curated hubs for Google Search Console, AI SEO, analysis, reporting, and technical SEO.
+          </p>
+          <ul class="mt-5 flex flex-wrap gap-2">
+            {BLOG_CATEGORY_SLUGS.map((slug) => (
+              <li>
+                <a
+                  href={blogCategoryPath(slug)}
+                  class="inline-flex rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-bold text-slate-700 transition-colors hover:border-[#8ccdeb] hover:bg-[#f4fbff] hover:text-[#3b7597]"
+                >
+                  {BLOG_CATEGORY_LABELS[slug]}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section class="w-full space-y-12">
+        <div class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_18px_50px_-36px_rgba(15,23,42,0.28)]">
+          <div class="flex flex-col gap-4 border-b border-slate-200 px-5 py-5 md:flex-row md:items-center md:justify-between md:px-6">
+            <div>
+              <div class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#3b7597]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+                Editorial Library
+              </div>
+              <p class="mt-2 text-sm text-slate-500">
+                Browse strategy notes, product thinking, and search workflow breakdowns.
+              </p>
+            </div>
+            <div class="rounded-2xl bg-[#f4fbff] px-4 py-3 text-sm text-slate-600">
+              <span class="font-bold text-slate-800">{allPosts.length}</span> article{allPosts.length === 1 ? '' : 's'}
+            </div>
+          </div>
+        </div>
+
+        {allPosts.length > 0 ? (
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {allPosts.map((post) => {
+              const slug = blogEntrySlug(post);
+              const cover = post.data.coverImage?.trim();
+              const minRead = readingTimeMinutesFromMarkdown(post.body);
+              const cardExcerpt = post.data.excerpt?.trim() || post.data.description;
+              const cat = post.data.category;
+              return (
+              <a
+                href={blogPostPath(slug)}
+                class="group flex h-full min-h-[420px] flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1.5 hover:border-[#8ccdeb] hover:shadow-[0_24px_60px_-34px_rgba(15,23,42,0.34)]"
+              >
+                {cover ? (
+                  <div class="relative aspect-[16/10] w-full overflow-hidden">
+                    <img
+                      src={cover}
+                      alt={post.data.title || 'Blog Image'}
+                      class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/20 via-transparent to-white/10" />
+
+                    <div class="absolute left-4 top-4 flex items-center gap-1 rounded-full border border-white/60 bg-white/88 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-800 shadow-sm backdrop-blur-md">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky-500"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      {minRead} min
+                    </div>
+                  </div>
+                ) : (
+                  <div class="relative flex aspect-[16/10] w-full shrink-0 items-center justify-center bg-gradient-to-br from-sky-100 to-slate-100 sm:aspect-auto sm:w-56">
+                    <div class="absolute left-4 top-4 flex items-center gap-1 rounded-full border border-white/60 bg-white/88 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-800 shadow-sm backdrop-blur-md sm:left-auto sm:right-4 sm:top-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-sky-500"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                      {minRead} min
+                    </div>
+                    <span class="text-4xl font-black text-sky-300/90" aria-hidden="true">
+                      AI
+                    </span>
+                  </div>
+                )}
+
+                <div class="flex flex-grow flex-col p-5 md:p-6">
+                  <div class="mb-4 flex flex-wrap items-center gap-2">
+                    <div class="inline-flex h-6 items-center rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0 text-[10px] font-bold uppercase tracking-wider text-slate-600 hover:bg-slate-200">
+                      {new Date(post.data.pubDate).toLocaleDateString('en-GB', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </div>
+                    {cat && (
+                      <div class="inline-flex h-6 items-center rounded-full border border-[#80c4e9]/20 bg-[#80c4e9]/10 px-2.5 py-0 text-[10px] font-bold uppercase tracking-wider text-[#3b7597] shadow-none hover:bg-[#80c4e9]/10">
+                        {BLOG_CATEGORY_LABELS[cat]}
+                      </div>
+                    )}
+                    {!cat && post.data.tags?.[0] && (
+                      <div class="inline-flex h-6 items-center rounded-full border border-[#80c4e9]/20 bg-[#80c4e9]/10 px-2.5 py-0 text-[10px] font-bold uppercase tracking-wider text-[#3b7597] shadow-none hover:bg-[#80c4e9]/10">
+                        {post.data.tags[0]}
+                      </div>
+                    )}
+                  </div>
+
+                  <h3 class="mb-3 line-clamp-3 text-[1.35rem] font-bold leading-[1.25] text-slate-800 transition-colors duration-300 group-hover:text-sky-600">
+                    {post.data.title}
+                  </h3>
+
+                  <p class="mb-8 flex-grow text-sm leading-6 text-slate-500 line-clamp-3">
+                    {cardExcerpt}
+                  </p>
+
+                  <div class="mt-auto flex items-center justify-between border-t border-slate-100 pt-4">
+                    <div class="flex items-center gap-3">
+                      <div class="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-100 shadow-sm">
+                        <span class="text-[10px] font-bold text-slate-500">
+                          {(post.data.author || 'AIChatSEO Team')[0]}
+                        </span>
+                      </div>
+                      <div class="flex flex-col">
+                        <span class="line-clamp-1 text-xs font-bold text-slate-800">
+                          {post.data.author || 'AIChatSEO Team'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <span class="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-[0.16em] text-sky-500 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+                      Read
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                    </span>
+                  </div>
+                </div>
+              </a>
+              );
+            })}
+          </div>
+        ) : (
+          <div class="rounded-4xl border border-slate-200 bg-white p-10 text-center shadow-float">
+            <p class="text-slate-600">No posts yet.</p>
+            <p class="mt-2 text-sm text-slate-500">Add <code class="rounded bg-slate-100 px-1.5 py-0.5 text-xs">.md</code> or <code class="rounded bg-slate-100 px-1.5 py-0.5 text-xs">.mdx</code> files under <code class="rounded bg-slate-100 px-1.5 py-0.5 text-xs">src/content/blog/</code>.</p>
+          </div>
+        )}
+      </section>
+    </main>
+  </div>
+</Layout>

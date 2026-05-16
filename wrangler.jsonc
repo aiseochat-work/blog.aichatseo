@@ -12,7 +12,6 @@
     "not_found_handling": "404-page"
   },
   "vars": {
-    // DATABASE_URL must be set on this Worker (Dashboard → Variables & Secrets, or `wrangler secret put DATABASE_URL`).
     "PUBLIC_SITE_URL": "https://blog.aichatseo.com"
   },
   "observability": {
